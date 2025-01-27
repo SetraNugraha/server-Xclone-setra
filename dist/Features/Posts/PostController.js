@@ -12,37 +12,19 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const UserService_1 = __importDefault(require("./UserService"));
-const getAllUsers = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+const PostService_1 = __importDefault(require("./PostService"));
+const getAllPosts = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const data = yield UserService_1.default.getAllUsers();
-        res.status(200).json({
-            success: true,
-            message: "Get all users success",
-            data: data.length > 0 ? data : "Users not found",
-        });
-    }
-    catch (error) {
-        if (error instanceof Error) {
-            res.status(400).json({
-                success: false,
-                message: error.message,
+        const data = yield PostService_1.default.getAllPosts();
+        if (!data || (data === null || data === void 0 ? void 0 : data.length) === 0) {
+            res.status(404).json({
+                success: true,
+                message: "Posts Not found",
             });
-            return;
         }
-        res.status(500).json({
-            success: false,
-            message: "Internal server error",
-        });
-    }
-});
-const getUserById = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        const userId = parseInt(req.params.userId, 10);
-        const data = yield UserService_1.default.getUserById(userId);
         res.status(200).json({
             success: true,
-            message: "Success get user by id",
+            message: "Get all posts success",
             data: data,
         });
     }
@@ -60,36 +42,47 @@ const getUserById = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
         });
     }
 });
-const register = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+const getPostByUserId = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const { name, email, password } = req.body;
-        const profileImage = req.file ? req.file.filename : null;
-        // Create Username
-        const username = name.trim().toLowerCase() + new Date().getTime().toString().slice(-5);
-        // Prepare Data
-        const registerData = {
-            name: name.trim(),
-            username: String(username),
-            email: email.trim(),
-            password: password.trim(),
-            profileImage: profileImage,
-        };
-        const register = yield UserService_1.default.register(registerData);
-        res.status(201).json({
+        const userId = parseInt(req.params.userId);
+        const post = yield PostService_1.default.getPostByUserId(userId);
+        res.status(200).json({
             success: true,
-            message: "Register success",
-            data: register,
+            message: "get post by user id success",
+            data: post,
         });
     }
     catch (error) {
-        if (error && typeof error === "object" && "path" in error && "message" in error) {
+        if (error instanceof Error) {
             res.status(400).json({
                 success: false,
-                path: error.path,
                 message: error.message,
             });
             return;
         }
+        res.status(500).json({
+            success: false,
+            message: "Internal server error",
+        });
+    }
+});
+const createNewPost = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { userId, body } = req.body;
+        const image = req.file ? req.file.filename : null;
+        const bodyPost = {
+            userId: userId,
+            body: body,
+            postImage: image,
+        };
+        const newPost = yield PostService_1.default.createNewPost(bodyPost);
+        res.status(201).json({
+            success: true,
+            message: "Post created",
+            data: newPost,
+        });
+    }
+    catch (error) {
         if (error instanceof Error) {
             res.status(400).json({
                 success: false,
@@ -104,7 +97,7 @@ const register = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     }
 });
 exports.default = {
-    getAllUsers,
-    getUserById,
-    register,
+    getAllPosts,
+    getPostByUserId,
+    createNewPost,
 };

@@ -5,6 +5,7 @@ import cookieParser from "cookie-parser"
 
 // Routes
 import UserRoute from "./Features/Users/UserRoute"
+import PostRoute from "./Features/Posts/PostRoute"
 
 dotenv.config()
 const app = express()
@@ -15,7 +16,7 @@ app.use(cors({ origin: "http://localhost:3000", credentials: true }))
 app.use(cookieParser())
 app.use(express.json())
 app.use("/api", router)
-router.use(UserRoute)
+router.use(UserRoute, PostRoute)
 
 const port = 3000
 app.listen(port, () => {

@@ -64,14 +64,14 @@ const register = async (req: Request, res: Response): Promise<void> => {
     const profileImage = req.file ? req.file.filename : null
 
     // Create Username
-    const username: string = name.trim().replace(/\s+/g, "").toLowerCase() + new Date().getTime()
+    const username: string = name.trim().toLowerCase() + new Date().getTime().toString().slice(-5)
 
     // Prepare Data
     const registerData: CreateNewUser = {
       name: name.trim(),
       username: String(username),
-      email: email,
-      password: password,
+      email: email.trim(),
+      password: password.trim(),
       profileImage: profileImage,
     }
 
@@ -102,7 +102,7 @@ const register = async (req: Request, res: Response): Promise<void> => {
       return
     }
 
-    res.status(400).json({
+    res.status(500).json({
       success: false,
       message: "Internal server error",
     })
