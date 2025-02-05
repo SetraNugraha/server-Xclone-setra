@@ -27,10 +27,11 @@ const getPostByUserId = (userId) => __awaiter(void 0, void 0, void 0, function* 
     if (!userId) {
         throw new Error("user id not found or missing");
     }
-    if (isNaN(userId)) {
-        throw new Error("user id must be a number");
+    const userExists = yield UserRepository_1.default.getUserById(Number(userId));
+    if (!userExists) {
+        throw new Error("User not found");
     }
-    const post = yield PostRepository_1.default.selectPostByUserId(userId);
+    const post = yield PostRepository_1.default.selectPostByUserId(userExists.id);
     return post;
 });
 const createNewPost = (reqBody) => __awaiter(void 0, void 0, void 0, function* () {
@@ -50,8 +51,26 @@ const createNewPost = (reqBody) => __awaiter(void 0, void 0, void 0, function* (
     const newPost = yield PostRepository_1.default.insertNewPost(bodyPost);
     return newPost;
 });
+const deletePost = (userId, postId) => __awaiter(void 0, void 0, void 0, function* () {
+    console.log("user id: ", userId);
+    if (!userId && !postId && postId < 0 && userId < 0) {
+        throw new Error("user id & post id are required");
+    }
+    // Check user exists
+    const userExists = yield UserRepository_1.default.getUserById(Number(userId));
+    if (!userExists) {
+        throw new Error("User not found");
+    }
+    // Check post exists
+    const postExists = yield PostRepository_1.default.selectPostById(Number(postId));
+    if (!postExists) {
+        throw new Error("Post not found");
+    }
+    return PostRepository_1.default.deletePost(userExists.id, postExists.id);
+});
 exports.default = {
     getAllPosts,
     getPostByUserId,
     createNewPost,
+    deletePost,
 };

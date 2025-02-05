@@ -36,7 +36,11 @@ const getAllPosts = async (req: Request, res: Response): Promise<void> => {
 
 const getPostByUserId = async (req: Request, res: Response) => {
   try {
-    const userId = parseInt(req.params.userId)
+    const userId = Number(req.query.userId)
+
+    if (isNaN(userId)) {
+      throw new Error("user id must be a number")
+    }
 
     const post = await PostService.getPostByUserId(userId)
 
@@ -67,6 +71,13 @@ const createNewPost = async (req: Request, res: Response): Promise<void> => {
     const { userId, body } = req.body
     const image = req.file ? req.file.filename : null
 
+    if (isNaN(userId)) {
+      res.status(400).json({
+        success: false,
+        message: "user id must be number",
+      })
+    }
+
     const bodyPost = {
       userId: userId,
       body: body,
@@ -96,8 +107,44 @@ const createNewPost = async (req: Request, res: Response): Promise<void> => {
   }
 }
 
+const deletePost = async (req: Request, res: Response) => {
+  try {
+    const userId = Number(req.query.userId)
+    const postId = Number(req.query.postId)
+
+    if (isNaN(userId) && isNaN(postId)) {
+      res.status(400).json({
+        success: false,
+        message: "user id and post id must be number",
+      })
+    }
+
+    await PostService.deletePost(userId, postId)
+
+    res.status(200).json({
+      success: true,
+      message: "Successfuly deleted post",
+    })
+  } catch (error) {
+    if (error instanceof Error) {
+      res.status(400).json({
+        success: false,
+        message: error.message,
+      })
+
+      return
+    }
+
+    res.status(500).json({
+      success: false,
+      message: "Internal server error",
+    })
+  }
+}
+
 export default {
   getAllPosts,
   getPostByUserId,
   createNewPost,
+  deletePost,
 }

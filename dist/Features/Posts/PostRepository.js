@@ -35,6 +35,18 @@ const selectPostByUserId = (userId) => __awaiter(void 0, void 0, void 0, functio
         throw new Error("Failed Select post by user id");
     }
 });
+const selectPostById = (postId) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const postById = yield database_1.default.posts.findUnique({
+            where: { id: postId },
+        });
+        return postById;
+    }
+    catch (error) {
+        console.error("PostRepository - selectPostById error: ", error);
+        throw new Error("Failed Select post by id");
+    }
+});
 const insertNewPost = (reqBody) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const newPost = yield database_1.default.posts.create({
@@ -47,8 +59,25 @@ const insertNewPost = (reqBody) => __awaiter(void 0, void 0, void 0, function* (
         throw new Error("Failed insert new post");
     }
 });
+const deletePost = (userId, postId) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const deletePost = yield database_1.default.posts.delete({
+            where: {
+                id: postId,
+                userId: userId,
+            },
+        });
+        return deletePost;
+    }
+    catch (error) {
+        console.error("PostRepository - deletePostByUserId error: ", error);
+        throw new Error("Failed delete post by user id");
+    }
+});
 exports.default = {
     selectAllPosts,
     selectPostByUserId,
+    selectPostById,
     insertNewPost,
+    deletePost,
 };

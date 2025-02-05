@@ -44,7 +44,10 @@ const getAllPosts = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
 });
 const getPostByUserId = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const userId = parseInt(req.params.userId);
+        const userId = Number(req.query.userId);
+        if (isNaN(userId)) {
+            throw new Error("user id must be a number");
+        }
         const post = yield PostService_1.default.getPostByUserId(userId);
         res.status(200).json({
             success: true,
@@ -70,6 +73,12 @@ const createNewPost = (req, res) => __awaiter(void 0, void 0, void 0, function* 
     try {
         const { userId, body } = req.body;
         const image = req.file ? req.file.filename : null;
+        if (isNaN(userId)) {
+            res.status(400).json({
+                success: false,
+                message: "user id must be number",
+            });
+        }
         const bodyPost = {
             userId: userId,
             body: body,
@@ -96,8 +105,39 @@ const createNewPost = (req, res) => __awaiter(void 0, void 0, void 0, function* 
         });
     }
 });
+const deletePost = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const userId = Number(req.query.userId);
+        const postId = Number(req.query.postId);
+        if (isNaN(userId) && isNaN(postId)) {
+            res.status(400).json({
+                success: false,
+                message: "user id and post id must be number",
+            });
+        }
+        yield PostService_1.default.deletePost(userId, postId);
+        res.status(200).json({
+            success: true,
+            message: "Successfuly deleted post",
+        });
+    }
+    catch (error) {
+        if (error instanceof Error) {
+            res.status(400).json({
+                success: false,
+                message: error.message,
+            });
+            return;
+        }
+        res.status(500).json({
+            success: false,
+            message: "Internal server error",
+        });
+    }
+});
 exports.default = {
     getAllPosts,
     getPostByUserId,
     createNewPost,
+    deletePost,
 };

@@ -18,11 +18,12 @@ const getPostByUserId = async (userId: number) => {
     throw new Error("user id not found or missing")
   }
 
-  if (isNaN(userId)) {
-    throw new Error("user id must be a number")
+  const userExists = await UserRepository.getUserById(Number(userId))
+  if (!userExists) {
+    throw new Error("User not found")
   }
 
-  const post = await PostRepository.selectPostByUserId(userId)
+  const post = await PostRepository.selectPostByUserId(userExists.id)
   return post
 }
 
@@ -49,8 +50,31 @@ const createNewPost = async (reqBody: CreateNewPost) => {
   return newPost
 }
 
+const deletePost = async (userId: number, postId: number) => {
+  console.log("user id: ", userId)
+
+  if (!userId && !postId && postId < 0 && userId < 0) {
+    throw new Error("user id & post id are required")
+  }
+
+  // Check user exists
+  const userExists = await UserRepository.getUserById(Number(userId))
+  if (!userExists) {
+    throw new Error("User not found")
+  }
+
+  // Check post exists
+  const postExists = await PostRepository.selectPostById(Number(postId))
+  if (!postExists) {
+    throw new Error("Post not found")
+  }
+
+  return PostRepository.deletePost(userExists.id, postExists.id)
+}
+
 export default {
   getAllPosts,
   getPostByUserId,
   createNewPost,
+  deletePost,
 }

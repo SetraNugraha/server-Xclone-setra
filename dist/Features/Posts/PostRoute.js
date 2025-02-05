@@ -9,4 +9,5 @@ const router = express_1.default.Router();
 router.get("/posts", PostController_1.default.getAllPosts);
 router.get("/posts/userPost", PostController_1.default.getPostByUserId);
 router.post("/posts/create", PostController_1.default.createNewPost);
+router.delete("/posts/delete", PostController_1.default.deletePost);
 exports.default = router;

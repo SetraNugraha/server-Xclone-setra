@@ -25,6 +25,19 @@ const selectPostByUserId = async (userId: number) => {
   }
 }
 
+const selectPostById = async (postId: number) => {
+  try {
+    const postById = await prisma.posts.findUnique({
+      where: { id: postId },
+    })
+
+    return postById
+  } catch (error) {
+    console.error("PostRepository - selectPostById error: ", error)
+    throw new Error("Failed Select post by id")
+  }
+}
+
 const insertNewPost = async (reqBody: CreateNewPost) => {
   try {
     const newPost = await prisma.posts.create({
@@ -38,8 +51,26 @@ const insertNewPost = async (reqBody: CreateNewPost) => {
   }
 }
 
+const deletePost = async (userId: number, postId: number) => {
+  try {
+    const deletePost = await prisma.posts.delete({
+      where: {
+        id: postId,
+        userId: userId,
+      },
+    })
+
+    return deletePost
+  } catch (error) {
+    console.error("PostRepository - deletePostByUserId error: ", error)
+    throw new Error("Failed delete post by user id")
+  }
+}
+
 export default {
   selectAllPosts,
   selectPostByUserId,
+  selectPostById,
   insertNewPost,
+  deletePost,
 }
