@@ -2,6 +2,7 @@ import express from "express"
 import dotenv from "dotenv"
 import cors from "cors"
 import cookieParser from "cookie-parser"
+import morgan from "morgan"
 
 // Routes
 import UserRoute from "./Features/Users/UserRoute"
@@ -15,6 +16,7 @@ const router = express.Router()
 app.use(cors({ origin: "http://localhost:3000", credentials: true }))
 app.use(cookieParser())
 app.use(express.json())
+app.use(morgan("dev"))
 app.use("/api", router)
 router.use(UserRoute, PostRoute)
 
