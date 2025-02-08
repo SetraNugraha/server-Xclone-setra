@@ -12,7 +12,7 @@ const selectAllPosts = async () => {
   }
 }
 
-const selectPostByUserId = async (userId: number) => {
+const selectPostByUserId = async (userId: string) => {
   try {
     const post = await prisma.posts.findMany({
       where: { userId },
@@ -25,7 +25,7 @@ const selectPostByUserId = async (userId: number) => {
   }
 }
 
-const selectPostById = async (postId: number) => {
+const selectPostById = async (postId: string) => {
   try {
     const postById = await prisma.posts.findUnique({
       where: { id: postId },
@@ -51,7 +51,7 @@ const insertNewPost = async (reqBody: CreateNewPost) => {
   }
 }
 
-const deletePost = async (userId: number, postId: number) => {
+const deletePost = async (userId: string, postId: string) => {
   try {
     const deletePost = await prisma.posts.delete({
       where: {

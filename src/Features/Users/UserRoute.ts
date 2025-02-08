@@ -1,12 +1,31 @@
-import express from "express"
-import UserController from "./UserController"
+import { getAllUsers, getUserById, register, login, logout } from "./UserController"
 import { uploadUserProfile } from "../../middlewares/UploadUserProfile"
+import { IRouting, HttpMethod } from "../../types/Routing.type"
 
-const router = express.Router()
-
-router.get("/users", UserController.getAllUsers)
-router.get("/users/:userId", UserController.getUserById)
-
-router.post("/users/register", uploadUserProfile.single("profileImage"), UserController.register)
-
-export default router
+export const UserRoutes: IRouting[] = [
+  {
+    method: HttpMethod.GET,
+    url: "/users",
+    controller: getAllUsers,
+  },
+  {
+    method: HttpMethod.GET,
+    url: "/users/:userId",
+    controller: getUserById,
+  },
+  {
+    method: HttpMethod.POST,
+    url: "/users/register",
+    controller: register,
+  },
+  {
+    method: HttpMethod.POST,
+    url: "/users/login",
+    controller: login,
+  },
+  {
+    method: HttpMethod.DELETE,
+    url: "/users/logout/:userId",
+    controller: logout,
+  },
+]

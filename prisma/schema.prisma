@@ -14,12 +14,13 @@ datasource db {
 }
 
 model Users {
-  id Int @id @default(autoincrement())
+  id String @id @db.Text @default(uuid())
   name String
   username String @unique
   email String @unique
   password String
   profileImage String?
+  birthday String
   token String?
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
@@ -31,8 +32,8 @@ model Users {
 }
 
 model Posts {
-  id Int @id @default(autoincrement())
-  userId Int
+  id String @id @db.Text @default(uuid())
+  userId String @db.Text
   body String @db.Text
   postImage String?
   created_at DateTime @default(now())
@@ -45,9 +46,9 @@ model Posts {
 }
 
 model Comments {
-  id Int @id @default(autoincrement())
-  userId Int
-  postId Int
+  id String @id @db.Text @default(uuid())
+  userId String @db.Text
+  postId String @db.Text
   body String
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
@@ -58,9 +59,9 @@ model Comments {
 }
 
 model Likes {
-  id Int @id @default(autoincrement())
-  userId Int
-  postId Int
+  id String @id @db.Text @default(uuid())
+  userId String @db.Text
+  postId String @db.Text
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
 

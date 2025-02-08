@@ -1,11 +1,25 @@
-import express from "express"
-import PostController from "./PostController"
+import { getAllPosts, getPostByUserId, createNewPost, deletePost } from "./PostController"
+import { IRouting, HttpMethod } from "../../types/Routing.type"
 
-const router = express.Router()
-
-router.get("/posts", PostController.getAllPosts)
-router.get("/posts/userPost", PostController.getPostByUserId)
-router.post("/posts/create", PostController.createNewPost)
-router.delete("/posts/delete", PostController.deletePost)
-
-export default router
+export const PostRoutes: IRouting[] = [
+  {
+    method: HttpMethod.GET,
+    url: "/posts",
+    controller: getAllPosts,
+  },
+  {
+    method: HttpMethod.GET,
+    url: "/posts/user/:userId",
+    controller: getPostByUserId,
+  },
+  {
+    method: HttpMethod.POST,
+    url: "/posts/create",
+    controller: createNewPost,
+  },
+  {
+    method: HttpMethod.DELETE,
+    url: "/posts/delete/:userId",
+    controller: deletePost,
+  },
+]

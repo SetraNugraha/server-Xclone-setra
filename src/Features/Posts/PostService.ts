@@ -13,12 +13,12 @@ const getAllPosts = async () => {
   }
 }
 
-const getPostByUserId = async (userId: number) => {
+const getPostByUserId = async (userId: string) => {
   if (!userId) {
     throw new Error("user id not found or missing")
   }
 
-  const userExists = await UserRepository.getUserById(Number(userId))
+  const userExists = await UserRepository.getUserById(userId)
   if (!userExists) {
     throw new Error("User not found")
   }
@@ -30,7 +30,7 @@ const getPostByUserId = async (userId: number) => {
 const createNewPost = async (reqBody: CreateNewPost) => {
   const { userId, body, postImage } = reqBody
 
-  const userExists = await UserRepository.getUserById(Number(userId))
+  const userExists = await UserRepository.getUserById(userId)
   if (!userExists) {
     throw new Error("User not found")
   }
@@ -50,21 +50,19 @@ const createNewPost = async (reqBody: CreateNewPost) => {
   return newPost
 }
 
-const deletePost = async (userId: number, postId: number) => {
-  console.log("user id: ", userId)
-
-  if (!userId && !postId && postId < 0 && userId < 0) {
+const deletePost = async (userId: string, postId: string) => {
+  if (!userId && !postId) {
     throw new Error("user id & post id are required")
   }
 
   // Check user exists
-  const userExists = await UserRepository.getUserById(Number(userId))
+  const userExists = await UserRepository.getUserById(userId)
   if (!userExists) {
     throw new Error("User not found")
   }
 
   // Check post exists
-  const postExists = await PostRepository.selectPostById(Number(postId))
+  const postExists = await PostRepository.selectPostById(postId)
   if (!postExists) {
     throw new Error("Post not found")
   }

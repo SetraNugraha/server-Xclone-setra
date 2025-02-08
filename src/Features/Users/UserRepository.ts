@@ -2,7 +2,7 @@ import prisma from "../../config/database"
 import { Users } from "@prisma/client"
 
 // Type
-import { CreateNewUser } from "../../types/Users.type"
+import { CreateNewUser, UserDTO, UserModel } from "../../types/Users.type"
 
 const getAllUsers = async (): Promise<Users[]> => {
   try {
@@ -14,10 +14,18 @@ const getAllUsers = async (): Promise<Users[]> => {
   }
 }
 
-const getUserById = async (userId: number): Promise<Users | null> => {
+const getUserById = async (userId: string): Promise<UserDTO | null> => {
   try {
     const data = await prisma.users.findUnique({
       where: { id: userId },
+      select: {
+        id: true,
+        name: true,
+        username: true,
+        email: true,
+        profileImage: true,
+        birthday: true,
+      },
     })
 
     return data
@@ -28,22 +36,40 @@ const getUserById = async (userId: number): Promise<Users | null> => {
 }
 
 // Validate Email Exists
-const isEmailExists = async (email: string): Promise<boolean> => {
-  const data = await prisma.users.findUnique({
-    where: { email: email },
-  })
+const getUserByEmail = async (email: string): Promise<UserModel | null> => {
+  try {
+    const data = await prisma.users.findUnique({
+      where: { email: email },
+      select: {
+        id: true,
+        name: true,
+        username: true,
+        email: true,
+        password: true,
+        profileImage: true,
+        birthday: true,
+      },
+    })
 
-  if (data || data !== null) {
-    return true
+    return data
+  } catch (error) {
+    console.error("Error fetching user by email: ", error)
+    throw new Error("Error fetching user by email")
   }
-
-  return false
 }
 
-const register = async (reqBody: CreateNewUser): Promise<Users> => {
+const register = async (reqBody: CreateNewUser): Promise<UserDTO> => {
   try {
     const register = await prisma.users.create({
       data: reqBody,
+      select: {
+        id: true,
+        name: true,
+        username: true,
+        email: true,
+        profileImage: true,
+        birthday: true,
+      },
     })
 
     return register
@@ -53,9 +79,39 @@ const register = async (reqBody: CreateNewUser): Promise<Users> => {
   }
 }
 
+const updateToken = async (userId: string, token: string) => {
+  try {
+    const updatedToken = await prisma.users.update({
+      where: { id: userId },
+      data: { token: token },
+    })
+
+    return updatedToken
+  } catch (error) {
+    console.error("Error update user token ", error)
+    throw new Error("Error update user token")
+  }
+}
+
+const deleteToken = async (userId: string) => {
+  try {
+    const deletedToken = await prisma.users.update({
+      where: { id: userId },
+      data: { token: null },
+    })
+
+    return deletedToken
+  } catch (error) {
+    console.error("Error delete user token ", error)
+    throw new Error("Error delete user token")
+  }
+}
+
 export default {
   getAllUsers,
   getUserById,
+  getUserByEmail,
   register,
-  isEmailExists,
+  updateToken,
+  deleteToken
 }

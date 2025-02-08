@@ -12,6 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.deletePost = exports.createNewPost = exports.getPostByUserId = exports.getAllPosts = void 0;
 const PostService_1 = __importDefault(require("./PostService"));
 const getAllPosts = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
@@ -42,12 +43,10 @@ const getAllPosts = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
         });
     }
 });
+exports.getAllPosts = getAllPosts;
 const getPostByUserId = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const userId = Number(req.query.userId);
-        if (isNaN(userId)) {
-            throw new Error("user id must be a number");
-        }
+        const userId = req.params.userId;
         const post = yield PostService_1.default.getPostByUserId(userId);
         res.status(200).json({
             success: true,
@@ -69,6 +68,7 @@ const getPostByUserId = (req, res) => __awaiter(void 0, void 0, void 0, function
         });
     }
 });
+exports.getPostByUserId = getPostByUserId;
 const createNewPost = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { userId, body } = req.body;
@@ -105,16 +105,11 @@ const createNewPost = (req, res) => __awaiter(void 0, void 0, void 0, function* 
         });
     }
 });
+exports.createNewPost = createNewPost;
 const deletePost = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const userId = Number(req.query.userId);
-        const postId = Number(req.query.postId);
-        if (isNaN(userId) && isNaN(postId)) {
-            res.status(400).json({
-                success: false,
-                message: "user id and post id must be number",
-            });
-        }
+        const userId = req.params.userId;
+        const postId = String(req.query.postId);
         yield PostService_1.default.deletePost(userId, postId);
         res.status(200).json({
             success: true,
@@ -135,9 +130,4 @@ const deletePost = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
         });
     }
 });
-exports.default = {
-    getAllPosts,
-    getPostByUserId,
-    createNewPost,
-    deletePost,
-};
+exports.deletePost = deletePost;

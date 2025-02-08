@@ -1,24 +1,35 @@
 import express from "express"
+import prisma from "./config/database"
 import dotenv from "dotenv"
 import cors from "cors"
 import cookieParser from "cookie-parser"
+import morgan from "morgan"
 
-// Routes
-import UserRoute from "./Features/Users/UserRoute"
-import PostRoute from "./Features/Posts/PostRoute"
+// Routing
+import Routing from "./Features/Routes/index"
 
 dotenv.config()
 const app = express()
-const router = express.Router()
+const port = process.env.PORT
 
 // Middleware
-app.use(cors({ origin: "http://localhost:3000", credentials: true }))
+app.use(cors({ origin: "http://localhost:5713", credentials: true }))
 app.use(cookieParser())
 app.use(express.json())
-app.use("/api", router)
-router.use(UserRoute, PostRoute)
+app.use(morgan("dev"))
+app.use("/api", Routing)
 
-const port = 3000
-app.listen(port, () => {
-  console.log(`Server running in port: ${port}`)
-})
+async function startServer() {
+  try {
+    await prisma.$connect()
+    console.log("Connected to database successfully")
+
+    app.listen(port, () => {
+      console.log(`Server running on port ${port}`)
+    })
+  } catch (error) {
+    console.error("Failed to connect database:", error)
+    process.exit(1)
+  }
+}
+startServer()
