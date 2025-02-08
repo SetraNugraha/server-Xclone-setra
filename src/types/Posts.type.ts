@@ -1,5 +1,5 @@
 export interface CreateNewPost {
-  userId: number
+  userId: string
   body: string
   postImage: string | null
 }

@@ -1,7 +1,7 @@
 import { Request, Response } from "express"
 import PostService from "./PostService"
 
-const getAllPosts = async (req: Request, res: Response): Promise<void> => {
+export const getAllPosts = async (req: Request, res: Response): Promise<void> => {
   try {
     const data = await PostService.getAllPosts()
 
@@ -10,6 +10,8 @@ const getAllPosts = async (req: Request, res: Response): Promise<void> => {
         success: true,
         message: "Posts Not found",
       })
+
+      return
     }
 
     res.status(200).json({
@@ -31,16 +33,14 @@ const getAllPosts = async (req: Request, res: Response): Promise<void> => {
       success: false,
       message: "Internal server error",
     })
+
+    return
   }
 }
 
-const getPostByUserId = async (req: Request, res: Response) => {
+export const getPostByUserId = async (req: Request, res: Response) => {
   try {
-    const userId = Number(req.query.userId)
-
-    if (isNaN(userId)) {
-      throw new Error("user id must be a number")
-    }
+    const userId = req.params.userId
 
     const post = await PostService.getPostByUserId(userId)
 
@@ -63,20 +63,15 @@ const getPostByUserId = async (req: Request, res: Response) => {
       success: false,
       message: "Internal server error",
     })
+
+    return
   }
 }
 
-const createNewPost = async (req: Request, res: Response): Promise<void> => {
+export const createNewPost = async (req: Request, res: Response): Promise<void> => {
   try {
     const { userId, body } = req.body
     const image = req.file ? req.file.filename : null
-
-    if (isNaN(userId)) {
-      res.status(400).json({
-        success: false,
-        message: "user id must be number",
-      })
-    }
 
     const bodyPost = {
       userId: userId,
@@ -104,20 +99,15 @@ const createNewPost = async (req: Request, res: Response): Promise<void> => {
       success: false,
       message: "Internal server error",
     })
+
+    return
   }
 }
 
-const deletePost = async (req: Request, res: Response) => {
+export const deletePost = async (req: Request, res: Response) => {
   try {
-    const userId = Number(req.query.userId)
-    const postId = Number(req.query.postId)
-
-    if (isNaN(userId) && isNaN(postId)) {
-      res.status(400).json({
-        success: false,
-        message: "user id and post id must be number",
-      })
-    }
+    const userId = req.params.userId
+    const postId = String(req.query.postId)
 
     await PostService.deletePost(userId, postId)
 
@@ -139,12 +129,7 @@ const deletePost = async (req: Request, res: Response) => {
       success: false,
       message: "Internal server error",
     })
-  }
-}
 
-export default {
-  getAllPosts,
-  getPostByUserId,
-  createNewPost,
-  deletePost,
+    return
+  }
 }

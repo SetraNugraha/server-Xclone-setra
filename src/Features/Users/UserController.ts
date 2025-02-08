@@ -4,8 +4,9 @@ import { Request, Response } from "express"
 // Type
 import { Users } from "@prisma/client"
 import { CreateNewUser } from "../../types/Users.type"
+import { validateInput } from "../../utils/validateError"
 
-const getAllUsers = async (req: Request, res: Response): Promise<void> => {
+export const getAllUsers = async (req: Request, res: Response): Promise<void> => {
   try {
     const data: Users[] = await UserService.getAllUsers()
 
@@ -30,9 +31,9 @@ const getAllUsers = async (req: Request, res: Response): Promise<void> => {
   }
 }
 
-const getUserById = async (req: Request, res: Response): Promise<void> => {
+export const getUserById = async (req: Request, res: Response): Promise<void> => {
   try {
-    const userId: number = parseInt(req.params.userId, 10)
+    const userId = req.params.userId
 
     const data = await UserService.getUserById(userId)
 
@@ -58,21 +59,25 @@ const getUserById = async (req: Request, res: Response): Promise<void> => {
   }
 }
 
-const register = async (req: Request, res: Response): Promise<void> => {
+export const register = async (req: Request, res: Response): Promise<void> => {
   try {
-    const { name, email, password } = req.body
+    const { name, email, password, confirmPassword, birthday } = req.body
     const profileImage = req.file ? req.file.filename : null
+    // Regex Email Format
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
 
-    // Create Username
-    const username: string = name.trim().toLowerCase() + new Date().getTime().toString().slice(-5)
+    validateInput(!emailRegex.test(email), "email", "Invalid format email")
+    validateInput(password.length < 6, "password", "Password must be greater than 6 characters")
+    validateInput(password !== confirmPassword, "password", "Password do not match")
 
     // Prepare Data
-    const registerData: CreateNewUser = {
-      name: name.trim(),
-      username: String(username),
-      email: email.trim(),
-      password: password.trim(),
+    const registerData = {
+      name: name,
+      username: name,
+      email: email.toLowerCase(),
+      password: password,
       profileImage: profileImage,
+      birthday: birthday,
     }
 
     const register = await UserService.register(registerData)
@@ -106,11 +111,82 @@ const register = async (req: Request, res: Response): Promise<void> => {
       success: false,
       message: "Internal server error",
     })
+
+    return
   }
 }
 
-export default {
-  getAllUsers,
-  getUserById,
-  register,
+export const login = async (req: Request, res: Response) => {
+  try {
+    const email = req.body.email.trim().toLowerCase()
+    const password = req.body.password
+
+    // Regex Email Format
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
+    validateInput(!emailRegex.test(email), "email", "Invalid format email")
+    validateInput(password.length < 6, "password", "Password must be greater than 6 characters")
+
+    const { accessToken, refreshToken } = await UserService.login({ email, password })
+
+    res.cookie("refreshToken", refreshToken, {
+      httpOnly: true,
+      sameSite: "strict",
+      maxAge: 24 * 60 * 60 * 1000, // Hour * minute * second * mili scond = 1 day
+    })
+
+    res.status(200).json({
+      success: true,
+      message: "login success",
+      accessToken,
+    })
+  } catch (error) {
+    if (error && typeof error === "object" && "path" in error && "message" in error) {
+      res.status(400).json({
+        success: false,
+        path: error.path,
+        message: error.message,
+      })
+
+      return
+    }
+
+    if (error instanceof Error) {
+      res.status(400).json({
+        success: false,
+        message: error.message,
+      })
+
+      return
+    }
+
+    res.status(500).json({
+      success: false,
+      message: "Internal server error",
+    })
+
+    return
+  }
+}
+
+export const logout = async (req: Request, res: Response) => {
+  try {
+    const userId = req.params.userId
+    await UserService.logout(userId)
+    res.sendStatus(200)
+  } catch (error) {
+    if (error instanceof Error) {
+      res.status(400).json({
+        success: false,
+        message: error.message,
+      })
+
+      return
+    }
+    res.status(500).json({
+      success: false,
+      message: "Internal server error",
+    })
+
+    return
+  }
 }

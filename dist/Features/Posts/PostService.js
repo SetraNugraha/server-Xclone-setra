@@ -27,7 +27,7 @@ const getPostByUserId = (userId) => __awaiter(void 0, void 0, void 0, function* 
     if (!userId) {
         throw new Error("user id not found or missing");
     }
-    const userExists = yield UserRepository_1.default.getUserById(Number(userId));
+    const userExists = yield UserRepository_1.default.getUserById(userId);
     if (!userExists) {
         throw new Error("User not found");
     }
@@ -36,7 +36,7 @@ const getPostByUserId = (userId) => __awaiter(void 0, void 0, void 0, function* 
 });
 const createNewPost = (reqBody) => __awaiter(void 0, void 0, void 0, function* () {
     const { userId, body, postImage } = reqBody;
-    const userExists = yield UserRepository_1.default.getUserById(Number(userId));
+    const userExists = yield UserRepository_1.default.getUserById(userId);
     if (!userExists) {
         throw new Error("User not found");
     }
@@ -52,17 +52,16 @@ const createNewPost = (reqBody) => __awaiter(void 0, void 0, void 0, function* (
     return newPost;
 });
 const deletePost = (userId, postId) => __awaiter(void 0, void 0, void 0, function* () {
-    console.log("user id: ", userId);
-    if (!userId && !postId && postId < 0 && userId < 0) {
+    if (!userId && !postId) {
         throw new Error("user id & post id are required");
     }
     // Check user exists
-    const userExists = yield UserRepository_1.default.getUserById(Number(userId));
+    const userExists = yield UserRepository_1.default.getUserById(userId);
     if (!userExists) {
         throw new Error("User not found");
     }
     // Check post exists
-    const postExists = yield PostRepository_1.default.selectPostById(Number(postId));
+    const postExists = yield PostRepository_1.default.selectPostById(postId);
     if (!postExists) {
         throw new Error("Post not found");
     }
