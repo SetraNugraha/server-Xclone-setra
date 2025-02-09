@@ -108,7 +108,7 @@ const refreshToken = async (token: string) => {
     })
 
     // get data user
-    const { id: userId, name, username, email, profileImage, birthday } = userExists
+    const { id: userId, name, username, email: userEmail, profileImage, birthday } = userExists
 
     // set payload
     const payload = {
@@ -116,7 +116,7 @@ const refreshToken = async (token: string) => {
       name,
       username,
       profileImage,
-      email,
+      userEmail,
       birthday,
     }
 
