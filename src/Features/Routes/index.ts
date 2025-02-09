@@ -1,9 +1,10 @@
 import express from "express"
 import { PostRoutes } from "../Posts/PostRoute"
 import { UserRoutes } from "../Users/UserRoute"
+import { AuthRoutes } from "../Auth/AuthRoute"
 
 const router = express.Router()
-const allRoutes = [...PostRoutes, ...UserRoutes]
+const allRoutes = [...PostRoutes, ...UserRoutes, ...AuthRoutes]
 
 allRoutes.forEach((route) => {
   if (route.middleware) {

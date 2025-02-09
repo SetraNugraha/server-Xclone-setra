@@ -20,3 +20,7 @@ export interface UserDTO {
 export interface UserModel extends UserDTO {
   password: string
 }
+
+export interface UserWithToken extends UserDTO {
+  token: string | null
+}
