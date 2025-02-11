@@ -1,3 +1,4 @@
+/// <reference path="../../types/express.d.ts" />
 import { Request, Response } from "express"
 import PostService from "./PostService"
 
@@ -70,14 +71,16 @@ export const getPostByUserId = async (req: Request, res: Response) => {
 
 export const createNewPost = async (req: Request, res: Response): Promise<void> => {
   try {
-    const { userId, body } = req.body
+    const userId = req.user?.userId ?? ""
+    const body = req.body.body
     const image = req.file ? req.file.filename : null
 
     const bodyPost = {
-      userId: userId,
+      userId: userId ?? "",
       body: body,
       postImage: image,
     }
+
     const newPost = await PostService.createNewPost(bodyPost)
 
     res.status(201).json({
@@ -106,7 +109,7 @@ export const createNewPost = async (req: Request, res: Response): Promise<void> 
 
 export const deletePost = async (req: Request, res: Response) => {
   try {
-    const userId = req.params.userId
+    const userId = req.user?.userId ?? ""
     const postId = String(req.query.postId)
 
     await PostService.deletePost(userId, postId)

@@ -12,6 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.getUserById = exports.getAllUsers = void 0;
 const UserService_1 = __importDefault(require("./UserService"));
 const getAllUsers = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
@@ -36,9 +37,10 @@ const getAllUsers = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
         });
     }
 });
+exports.getAllUsers = getAllUsers;
 const getUserById = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const userId = parseInt(req.params.userId, 10);
+        const userId = req.params.userId;
         const data = yield UserService_1.default.getUserById(userId);
         res.status(200).json({
             success: true,
@@ -60,51 +62,4 @@ const getUserById = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
         });
     }
 });
-const register = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        const { name, email, password } = req.body;
-        const profileImage = req.file ? req.file.filename : null;
-        // Create Username
-        const username = name.trim().toLowerCase() + new Date().getTime().toString().slice(-5);
-        // Prepare Data
-        const registerData = {
-            name: name.trim(),
-            username: String(username),
-            email: email.trim(),
-            password: password.trim(),
-            profileImage: profileImage,
-        };
-        const register = yield UserService_1.default.register(registerData);
-        res.status(201).json({
-            success: true,
-            message: "Register success",
-            data: register,
-        });
-    }
-    catch (error) {
-        if (error && typeof error === "object" && "path" in error && "message" in error) {
-            res.status(400).json({
-                success: false,
-                path: error.path,
-                message: error.message,
-            });
-            return;
-        }
-        if (error instanceof Error) {
-            res.status(400).json({
-                success: false,
-                message: error.message,
-            });
-            return;
-        }
-        res.status(500).json({
-            success: false,
-            message: "Internal server error",
-        });
-    }
-});
-exports.default = {
-    getAllUsers,
-    getUserById,
-    register,
-};
+exports.getUserById = getUserById;

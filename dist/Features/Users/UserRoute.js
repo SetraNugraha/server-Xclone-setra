@@ -1,13 +1,17 @@
 "use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
-const express_1 = __importDefault(require("express"));
-const UserController_1 = __importDefault(require("./UserController"));
-const UploadUserProfile_1 = require("../../middlewares/UploadUserProfile");
-const router = express_1.default.Router();
-router.get("/users", UserController_1.default.getAllUsers);
-router.get("/users/:userId", UserController_1.default.getUserById);
-router.post("/users/register", UploadUserProfile_1.uploadUserProfile.single("profileImage"), UserController_1.default.register);
-exports.default = router;
+exports.UserRoutes = void 0;
+const UserController_1 = require("./UserController");
+const Routing_type_1 = require("../../types/Routing.type");
+exports.UserRoutes = [
+    {
+        method: Routing_type_1.HttpMethod.GET,
+        url: "/users",
+        controller: UserController_1.getAllUsers,
+    },
+    {
+        method: Routing_type_1.HttpMethod.GET,
+        url: "/users/:userId",
+        controller: UserController_1.getUserById,
+    },
+];

@@ -10,6 +10,6 @@ export enum HttpMethod {
 export interface IRouting {
   method: HttpMethod
   url: string
-  middleware?: (req: Request, res: Response, next: NextFunction) => void
+  middleware?: ((req: Request, res: Response, next: NextFunction) => void)[]
   controller: (req: Request, res: Response) => void | Promise<void>
 }

@@ -2,6 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.PostRoutes = void 0;
 const PostController_1 = require("./PostController");
+const auth_1 = require("../../middlewares/auth");
 const Routing_type_1 = require("../../types/Routing.type");
 exports.PostRoutes = [
     {
@@ -17,6 +18,7 @@ exports.PostRoutes = [
     {
         method: Routing_type_1.HttpMethod.POST,
         url: "/posts/create",
+        middleware: auth_1.verifyToken,
         controller: PostController_1.createNewPost,
     },
     {

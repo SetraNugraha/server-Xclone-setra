@@ -8,7 +8,7 @@ const allRoutes = [...PostRoutes, ...UserRoutes, ...AuthRoutes]
 
 allRoutes.forEach((route) => {
   if (route.middleware) {
-    router[route.method](route.url, route.middleware, route.controller)
+    router[route.method](route.url, ...route.middleware, route.controller)
   } else {
     router[route.method](route.url, route.controller)
   }

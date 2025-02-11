@@ -15,7 +15,16 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const database_1 = __importDefault(require("../../config/database"));
 const getAllUsers = () => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const data = yield database_1.default.users.findMany();
+        const data = yield database_1.default.users.findMany({
+            select: {
+                id: true,
+                name: true,
+                username: true,
+                email: true,
+                profileImage: true,
+                birthday: true,
+            },
+        });
         return data;
     }
     catch (error) {
@@ -27,6 +36,14 @@ const getUserById = (userId) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const data = yield database_1.default.users.findUnique({
             where: { id: userId },
+            select: {
+                id: true,
+                name: true,
+                username: true,
+                email: true,
+                profileImage: true,
+                birthday: true,
+            },
         });
         return data;
     }
@@ -35,31 +52,51 @@ const getUserById = (userId) => __awaiter(void 0, void 0, void 0, function* () {
         throw new Error("Error fetching user by id");
     }
 });
-// Validate Email Exists
-const isEmailExists = (email) => __awaiter(void 0, void 0, void 0, function* () {
-    const data = yield database_1.default.users.findUnique({
-        where: { email: email },
-    });
-    if (data || data !== null) {
-        return true;
-    }
-    return false;
-});
-const register = (reqBody) => __awaiter(void 0, void 0, void 0, function* () {
+const getUserByEmail = (email) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const register = yield database_1.default.users.create({
-            data: reqBody,
+        const data = yield database_1.default.users.findUnique({
+            where: { email: email },
+            select: {
+                id: true,
+                name: true,
+                username: true,
+                email: true,
+                password: true,
+                profileImage: true,
+                birthday: true,
+            },
         });
-        return register;
+        return data;
     }
     catch (error) {
-        console.error("Error register user: ", error);
-        throw new Error("Error register users");
+        console.error("Error fetching user by email: ", error);
+        throw new Error("Error fetching user by email");
+    }
+});
+const getUserByToken = (token) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const data = yield database_1.default.users.findFirst({
+            where: { token: token },
+            select: {
+                id: true,
+                name: true,
+                username: true,
+                email: true,
+                profileImage: true,
+                birthday: true,
+                token: true,
+            },
+        });
+        return data;
+    }
+    catch (error) {
+        console.error("Error fetching user by email: ", error);
+        throw new Error("Error fetching user by email");
     }
 });
 exports.default = {
     getAllUsers,
     getUserById,
-    register,
-    isEmailExists,
+    getUserByEmail,
+    getUserByToken,
 };

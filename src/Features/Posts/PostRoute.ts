@@ -1,5 +1,7 @@
 import { getAllPosts, getPostByUserId, createNewPost, deletePost } from "./PostController"
+import { verifyToken } from "../../middlewares/auth"
 import { IRouting, HttpMethod } from "../../types/Routing.type"
+import { uploadPostImage } from "../../middlewares/uploadPostImage"
 
 export const PostRoutes: IRouting[] = [
   {
@@ -15,11 +17,13 @@ export const PostRoutes: IRouting[] = [
   {
     method: HttpMethod.POST,
     url: "/posts/create",
+    middleware: [verifyToken, uploadPostImage.single("postImage")],
     controller: createNewPost,
   },
   {
     method: HttpMethod.DELETE,
-    url: "/posts/delete/:userId",
+    url: "/posts/delete",
+    middleware: [verifyToken],
     controller: deletePost,
   },
 ]

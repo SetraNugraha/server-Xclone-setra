@@ -6,8 +6,8 @@ import path from "path"
 const storage = multer.diskStorage({
   // Destination to store image
   destination: function (req: Request, file: Express.Multer.File, cb) {
-    // PATH Image User Profile
-    const userProfilePath = path.join(process.cwd(), "public", "images", "UserProfile")
+    // PATH Image Post Image
+    const userProfilePath = path.join(process.cwd(), "public", "images", "PostImage")
     cb(null, userProfilePath)
   },
 
@@ -39,7 +39,7 @@ const fileFilter = (req: Request, file: Express.Multer.File, cb: multer.FileFilt
 }
 
 // Inisialisasi multer
-export const uploadUserProfile = multer({
+export const uploadPostImage = multer({
   storage: storage,
   fileFilter: fileFilter,
   limits: {

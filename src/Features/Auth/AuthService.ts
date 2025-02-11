@@ -52,10 +52,10 @@ const login = async (reqBody: { email: string; password: string }) => {
     validateInput(!matchPassword, "password", "Password incorrect")
 
     // get data userExists
-    const { id, name, username, email: userEmail, birthday } = userExists
+    const { id: userId, name, username, email: userEmail, birthday } = userExists
 
     // set payload
-    const payload = { id, name, username, userEmail, birthday }
+    const payload = { userId, name, username, userEmail, birthday }
 
     // Handle TOKEN
     const accessTokenSecret = process.env.ACCESS_TOKEN
@@ -77,7 +77,7 @@ const login = async (reqBody: { email: string; password: string }) => {
     })
 
     // update token on table users, with resfresh token
-    await AuthRepository.updateToken(id, refreshToken)
+    await AuthRepository.updateToken(userId, refreshToken)
 
     return { accessToken, refreshToken }
   } catch (error) {

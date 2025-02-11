@@ -22,6 +22,7 @@ const getAllPosts = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
                 success: true,
                 message: "Posts Not found",
             });
+            return;
         }
         res.status(200).json({
             success: true,
@@ -41,6 +42,7 @@ const getAllPosts = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
             success: false,
             message: "Internal server error",
         });
+        return;
     }
 });
 exports.getAllPosts = getAllPosts;
@@ -66,21 +68,18 @@ const getPostByUserId = (req, res) => __awaiter(void 0, void 0, void 0, function
             success: false,
             message: "Internal server error",
         });
+        return;
     }
 });
 exports.getPostByUserId = getPostByUserId;
 const createNewPost = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a;
     try {
-        const { userId, body } = req.body;
+        const userId = (_a = req.user) === null || _a === void 0 ? void 0 : _a.userId;
+        const body = req.body.body;
         const image = req.file ? req.file.filename : null;
-        if (isNaN(userId)) {
-            res.status(400).json({
-                success: false,
-                message: "user id must be number",
-            });
-        }
         const bodyPost = {
-            userId: userId,
+            userId: userId !== null && userId !== void 0 ? userId : "",
             body: body,
             postImage: image,
         };
@@ -103,6 +102,7 @@ const createNewPost = (req, res) => __awaiter(void 0, void 0, void 0, function* 
             success: false,
             message: "Internal server error",
         });
+        return;
     }
 });
 exports.createNewPost = createNewPost;
@@ -128,6 +128,7 @@ const deletePost = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
             success: false,
             message: "Internal server error",
         });
+        return;
     }
 });
 exports.deletePost = deletePost;

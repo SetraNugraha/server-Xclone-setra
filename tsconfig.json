@@ -1,14 +1,17 @@
 {
   "compilerOptions": {
-    "target": "ES6",                  // Tentukan target ECMAScript
-    "module": "commonjs",             // Tentukan modul sebagai CommonJS untuk kompatibilitas dengan Node.js
-    "esModuleInterop": true,          // Agar kompatibel dengan import/export
-    "skipLibCheck": true,             // Untuk menghindari masalah dengan library saat pengembangan
-    "strict": true,                   // Mengaktifkan mode strict untuk pengecekan yang lebih ketat
-    "outDir": "./dist",               // Tentukan folder output untuk file yang dikompilasi
-    "rootDir": "./src",               // Tentukan folder sumber untuk file TypeScript
-    "allowJs": true                   // Memungkinkan menggunakan file JavaScript dalam proyek
+    "target": "ES6",
+    "module": "commonjs",
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "outDir": "./dist",
+    "rootDir": "./src",
+    "allowJs": true,
+    "typeRoots": ["./node_modules/@types", "./src/types"],
+    "declaration": true,
+    "types": ["node", "express"]
   },
-  "include": ["src/**/*"],            // Tentukan file yang akan disertakan
-  "exclude": ["node_modules"]         // Jangan sertakan node_modules
+  "include": ["src/**/*"],
+  "exclude": ["node_modules"]
 }

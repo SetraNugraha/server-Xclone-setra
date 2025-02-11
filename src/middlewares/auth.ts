@@ -2,13 +2,21 @@ import { Request, Response, NextFunction } from "express"
 import jwt, { JsonWebTokenError, JwtPayload } from "jsonwebtoken"
 
 // For req.user
-declare global {
-  namespace Express {
-    interface Request {
-      user?: JwtPayload
-    }
-  }
-}
+// declare global {
+//   namespace Express {
+//     interface Request {
+//       user?: JwtPayload & {
+//         userId: string
+//         name: string
+//         username: string
+//         email: string
+//         profileImage: string
+//         birthday: string
+//         exp?: number
+//       }
+//     }
+//   }
+// }
 
 export const verifyToken = (req: Request, res: Response, next: NextFunction) => {
   // Get Token from headers
