@@ -75,6 +75,15 @@ export const createNewPost = async (req: Request, res: Response): Promise<void> 
     const body = req.body.body
     const image = req.file ? req.file.filename : null
 
+    if (req.fileValidationError) {
+      res.status(400).json({
+        success: false,
+        message: req.fileValidationError,
+      })
+
+      return
+    }
+
     const bodyPost = {
       userId: userId ?? "",
       body: body,

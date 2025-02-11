@@ -15,6 +15,7 @@ declare global {
         exp?: number
       }
       file?: Express.Multer.File
+      fileValidationError?: string
     }
   }
 }

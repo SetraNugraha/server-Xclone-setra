@@ -1,7 +1,7 @@
 import { getAllPosts, getPostByUserId, createNewPost, deletePost } from "./PostController"
 import { verifyToken } from "../../middlewares/auth"
 import { IRouting, HttpMethod } from "../../types/Routing.type"
-import { uploadPostImage } from "../../middlewares/uploadPostImage"
+import { uploadPostImage } from "../../middlewares/uploadImage"
 
 export const PostRoutes: IRouting[] = [
   {

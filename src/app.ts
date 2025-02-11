@@ -7,6 +7,7 @@ import morgan from "morgan"
 
 // Routing
 import Routing from "./Features/Routes/index"
+import path from "path"
 
 dotenv.config()
 const app = express()
@@ -16,6 +17,7 @@ const port = process.env.PORT
 app.use(cors({ origin: "http://localhost:5713", credentials: true }))
 app.use(cookieParser())
 app.use(express.json())
+app.use("/images", express.static(path.join(process.cwd(), "public", "images")))
 app.use(morgan("dev"))
 app.use("/api", Routing)
 
