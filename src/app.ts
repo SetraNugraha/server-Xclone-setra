@@ -17,6 +17,7 @@ const port = process.env.PORT
 app.use(cors({ origin: "http://localhost:5713", credentials: true }))
 app.use(cookieParser())
 app.use(express.json())
+app.use(express.urlencoded({ extended: true }))
 app.use("/images", express.static(path.join(process.cwd(), "public", "images")))
 app.use(morgan("dev"))
 app.use("/api", Routing)

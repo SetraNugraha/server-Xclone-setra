@@ -1,3 +1,4 @@
+/// <reference path="../../types/express.d.ts" />
 import { Request, Response } from "express"
 import AuthService from "./AuthService"
 import { validateInput } from "../../utils/validateError"
@@ -7,7 +8,7 @@ export const register = async (req: Request, res: Response): Promise<void> => {
     const { name, email, password, confirmPassword, birthday } = req.body
     const profileImage = req.file ? req.file.filename : null
     // Regex Email Format
-    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
+    const emailRegex = /^(?!.*\.{2})[a-zA-Z0-9][a-zA-Z0-9._%+-]*@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
 
     validateInput(!emailRegex.test(email), "email", "Invalid format email")
     validateInput(password.length < 6, "password", "Password must be greater than 6 characters")

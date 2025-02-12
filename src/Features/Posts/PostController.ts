@@ -39,6 +39,35 @@ export const getAllPosts = async (req: Request, res: Response): Promise<void> =>
   }
 }
 
+export const getPostById = async (req: Request, res: Response) => {
+  try {
+    const postId = String(req.params.postId)
+    const postById = await PostService.getPostByPostId(postId)
+
+    res.status(200).json({
+      success: true,
+      message: "Get post by id success",
+      data: postById,
+    })
+  } catch (error) {
+    if (error instanceof Error) {
+      res.status(400).json({
+        success: false,
+        message: error.message,
+      })
+
+      return
+    }
+
+    res.status(500).json({
+      success: false,
+      message: "Internal server error",
+    })
+
+    return
+  }
+}
+
 export const getPostByUserId = async (req: Request, res: Response) => {
   try {
     const userId = req.params.userId
@@ -116,10 +145,41 @@ export const createNewPost = async (req: Request, res: Response): Promise<void> 
   }
 }
 
+export const toggleLike = async (req: Request, res: Response) => {
+  try {
+    const userId = req.user?.userId ?? ""
+    const postId = String(req.params.postId)
+
+    const result = await PostService.toggleLike(userId, postId)
+
+    res.status(200).json({
+      success: true,
+      message: "toggle like success",
+      isLike: result.liked,
+    })
+  } catch (error) {
+    if (error instanceof Error) {
+      res.status(400).json({
+        success: false,
+        message: error.message,
+      })
+
+      return
+    }
+
+    res.status(500).json({
+      success: false,
+      message: "Internal server error",
+    })
+
+    return
+  }
+}
+
 export const deletePost = async (req: Request, res: Response) => {
   try {
     const userId = req.user?.userId ?? ""
-    const postId = String(req.query.postId)
+    const postId = String(req.params.postId)
 
     await PostService.deletePost(userId, postId)
 

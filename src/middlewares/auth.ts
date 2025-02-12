@@ -1,24 +1,9 @@
+/// <reference path="../types/express.d.ts" />
 import { Request, Response, NextFunction } from "express"
 import jwt, { JsonWebTokenError, JwtPayload } from "jsonwebtoken"
+import prisma from "../config/database"
 
-// For req.user
-// declare global {
-//   namespace Express {
-//     interface Request {
-//       user?: JwtPayload & {
-//         userId: string
-//         name: string
-//         username: string
-//         email: string
-//         profileImage: string
-//         birthday: string
-//         exp?: number
-//       }
-//     }
-//   }
-// }
-
-export const verifyToken = (req: Request, res: Response, next: NextFunction) => {
+export const verifyToken = async (req: Request, res: Response, next: NextFunction) => {
   // Get Token from headers
   const token = req.headers.authorization?.split(" ")[1]
 
@@ -33,6 +18,21 @@ export const verifyToken = (req: Request, res: Response, next: NextFunction) => 
   // Verify Token from headers with access token env use jwt verify and store decode result to variable user
   try {
     const decode = jwt.verify(token, process.env.ACCESS_TOKEN as string) as JwtPayload
+
+    const userExists = await prisma.users.findFirst({
+      where: {
+        id: decode.userId,
+      },
+    })
+
+    // Check Token From DB
+    if (userExists?.token === null) {
+      return res.status(403).json({
+        success: false,
+        message: "Unauthorized, token not provided",
+      })
+    }
+
     req.user = {
       userId: decode.userId,
       name: decode.name,
