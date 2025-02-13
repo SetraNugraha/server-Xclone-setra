@@ -1,7 +1,7 @@
 import prisma from "../../config/database"
 
 // Type
-import { CreateNewUser, UserDTO, UserModel, UserWithToken } from "../../types/Users.type"
+import { UserDTO, UserModel, UserWithToken } from "../../types/Users.type"
 
 const getAllUsers = async (): Promise<UserDTO[]> => {
   try {
