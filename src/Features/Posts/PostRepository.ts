@@ -1,5 +1,5 @@
 import prisma from "../../config/database"
-import { CreateNewPost } from "../../types/Posts.type"
+import { CreateNewComment, CreateNewPost } from "../../types/Posts.type"
 
 const selectPosts = async (filter = {}) => {
   try {
@@ -29,11 +29,13 @@ const selectPostByUserId = async (userId: string) => selectPosts({ userId: userI
 
 const insertNewPost = async (reqBody: CreateNewPost) => {
   try {
-    const newPost = await prisma.posts.create({
-      data: reqBody,
-    })
+    return await prisma.$transaction(async (tx) => {
+      const newPost = await tx.posts.create({
+        data: reqBody,
+      })
 
-    return newPost
+      return newPost
+    })
   } catch (error) {
     console.error("PostRepository - insertPost error: ", error)
     throw new Error("Failed insert new post")
@@ -78,19 +80,64 @@ const toggleLike = async (userId: string, postId: string) => {
   }
 }
 
+const insertNewComment = async (reqBody: CreateNewComment) => {
+  try {
+    return await prisma.$transaction(async (tx) => {
+      const newComment = await tx.comments.create({
+        data: reqBody,
+      })
+
+      return newComment
+    })
+  } catch (error) {
+    console.error("PostRepository - insertNewComment Error: ", error)
+    throw new Error("Failed insert new comment")
+  }
+}
+
 const deletePost = async (userId: string, postId: string) => {
   try {
-    const deletePost = await prisma.posts.delete({
-      where: {
-        id: postId,
-        userId: userId,
-      },
-    })
+    return await prisma.$transaction(async (tx) => {
+      const deletePost = await tx.posts.delete({
+        where: {
+          id: postId,
+          userId: userId,
+        },
+      })
 
-    return deletePost
+      return deletePost
+    })
   } catch (error) {
     console.error("PostRepository - deletePostByUserId error: ", error)
     throw new Error("Failed delete post by user id")
+  }
+}
+
+const selectCommentById = async (commentId: string) => {
+  try {
+    const commentById = await prisma.comments.findUnique({
+      where: { id: commentId },
+    })
+
+    return commentById
+  } catch (error) {
+    console.error("PostRepository - selectCommentById Error: ", error)
+    throw new Error("Failed select comment by id")
+  }
+}
+
+const deleteComment = async (commentId: string) => {
+  try {
+    return await prisma.$transaction(async (tx) => {
+      const deletedComment = await tx.comments.delete({
+        where: { id: commentId },
+      })
+
+      return deletedComment
+    })
+  } catch (error) {
+    console.error("PostRepository - deleteComment Error: ", error)
+    throw new Error("Failed delete comment")
   }
 }
 
@@ -98,7 +145,10 @@ export default {
   selectAllPosts,
   selectPostByUserId,
   selectPostById,
+  selectCommentById,
   insertNewPost,
   toggleLike,
+  insertNewComment,
   deletePost,
+  deleteComment,
 }

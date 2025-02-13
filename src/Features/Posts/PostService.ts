@@ -1,4 +1,4 @@
-import { CreateNewPost } from "../../types/Posts.type"
+import { CreateNewComment, CreateNewPost } from "../../types/Posts.type"
 import PostRepository from "./PostRepository"
 import UserRepository from "../Users/UserRepository"
 import { unlinkImage } from "../../utils/unlinkImage"
@@ -86,6 +86,40 @@ const toggleLike = async (userId: string, postId: string) => {
   return toggleLike
 }
 
+const createNewComment = async (reqBody: CreateNewComment) => {
+  const { userId, postId, body } = reqBody
+
+  if (!userId || !postId) {
+    throw new Error("user id or post id missing")
+  }
+
+  // Check UserExists
+  const userExists = await UserRepository.getUserById(userId)
+  if (!userExists) {
+    throw new Error("User not found")
+  }
+
+  // Check PostExists
+  const postExists = await PostRepository.selectPostById(postId)
+  if (!postExists || postExists.length === 0) {
+    throw new Error("Post not found")
+  }
+
+  if (!body || body.length === 0 || body === "") {
+    throw new Error("Comment cannot be empty")
+  }
+
+  const prepareData = {
+    userId: userId,
+    postId: postId,
+    body: body,
+  }
+
+  const newComment = await PostRepository.insertNewComment(prepareData)
+
+  return newComment
+}
+
 const deletePost = async (userId: string, postId: string) => {
   if (!userId || !postId) {
     throw new Error("user id & post id are required")
@@ -111,11 +145,29 @@ const deletePost = async (userId: string, postId: string) => {
   return PostRepository.deletePost(userExists.id, postExists[0].id)
 }
 
+const deleteComment = async (commentId: string) => {
+  if (!commentId) {
+    throw new Error("comment id are missing")
+  }
+
+  // Check comment exists
+  const commentExists = await PostRepository.selectCommentById(commentId)
+  if (!commentExists) {
+    throw new Error("comment not found")
+  }
+
+  const deletedComment = await PostRepository.deleteComment(commentExists.id)
+
+  return deletedComment
+}
+
 export default {
   getAllPosts,
   getPostByPostId,
   getPostByUserId,
   createNewPost,
   toggleLike,
+  createNewComment,
   deletePost,
+  deleteComment,
 }

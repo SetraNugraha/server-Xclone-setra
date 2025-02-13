@@ -39,7 +39,7 @@ export const getAllPosts = async (req: Request, res: Response): Promise<void> =>
   }
 }
 
-export const getPostById = async (req: Request, res: Response) => {
+export const getPostById = async (req: Request, res: Response): Promise<void> => {
   try {
     const postId = String(req.params.postId)
     const postById = await PostService.getPostByPostId(postId)
@@ -68,7 +68,7 @@ export const getPostById = async (req: Request, res: Response) => {
   }
 }
 
-export const getPostByUserId = async (req: Request, res: Response) => {
+export const getPostByUserId = async (req: Request, res: Response): Promise<void> => {
   try {
     const userId = req.params.userId
 
@@ -145,10 +145,10 @@ export const createNewPost = async (req: Request, res: Response): Promise<void> 
   }
 }
 
-export const toggleLike = async (req: Request, res: Response) => {
+export const toggleLike = async (req: Request, res: Response): Promise<void> => {
   try {
     const userId = req.user?.userId ?? ""
-    const postId = String(req.params.postId)
+    const postId = req.params.postId
 
     const result = await PostService.toggleLike(userId, postId)
 
@@ -176,7 +176,40 @@ export const toggleLike = async (req: Request, res: Response) => {
   }
 }
 
-export const deletePost = async (req: Request, res: Response) => {
+export const createComment = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const userId = req.user?.userId || ""
+    const postId = req.params.postId
+    const body = req.body.body
+
+    const finalData = { userId, postId, body }
+    const createNewComment = await PostService.createNewComment(finalData)
+
+    res.status(201).json({
+      success: true,
+      message: "success create comment",
+      data: createNewComment,
+    })
+  } catch (error) {
+    if (error instanceof Error) {
+      res.status(400).json({
+        success: false,
+        message: error.message,
+      })
+
+      return
+    }
+
+    res.status(500).json({
+      success: false,
+      message: "Internal server error",
+    })
+
+    return
+  }
+}
+
+export const deletePost = async (req: Request, res: Response): Promise<void> => {
   try {
     const userId = req.user?.userId ?? ""
     const postId = String(req.params.postId)
@@ -186,6 +219,34 @@ export const deletePost = async (req: Request, res: Response) => {
     res.status(200).json({
       success: true,
       message: "Successfuly deleted post",
+    })
+  } catch (error) {
+    if (error instanceof Error) {
+      res.status(400).json({
+        success: false,
+        message: error.message,
+      })
+
+      return
+    }
+
+    res.status(500).json({
+      success: false,
+      message: "Internal server error",
+    })
+
+    return
+  }
+}
+
+export const deleteComment = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const commentId = req.params.commentId
+    const deletedComment = await PostService.deleteComment(commentId)
+
+    res.status(200).json({
+      success: true,
+      message: "delete comment success",
     })
   } catch (error) {
     if (error instanceof Error) {
