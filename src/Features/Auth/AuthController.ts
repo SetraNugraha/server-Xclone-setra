@@ -65,11 +65,6 @@ export const login = async (req: Request, res: Response): Promise<void> => {
     const email = req.body.email.trim().toLowerCase()
     const password = req.body.password
 
-    // Regex Email Format
-    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
-    validateInput(!emailRegex.test(email), "email", "Invalid format email")
-    validateInput(password.length < 6, "password", "Password must be greater than 6 characters")
-
     const { accessToken, refreshToken } = await AuthService.login({ email, password })
 
     res.cookie("refreshToken", refreshToken, {
@@ -88,15 +83,6 @@ export const login = async (req: Request, res: Response): Promise<void> => {
       res.status(400).json({
         success: false,
         path: error.path,
-        message: error.message,
-      })
-
-      return
-    }
-
-    if (error instanceof Error) {
-      res.status(400).json({
-        success: false,
         message: error.message,
       })
 
@@ -145,6 +131,13 @@ export const logout = async (req: Request, res: Response): Promise<void> => {
   try {
     const userId = req.params.userId
     await AuthService.logout(userId)
+
+    res.clearCookie("refreshToken", {
+      httpOnly: true,
+      sameSite: "strict",
+      path: "/",
+      expires: new Date(0),
+    })
     res.sendStatus(200)
   } catch (error) {
     if (error instanceof Error) {

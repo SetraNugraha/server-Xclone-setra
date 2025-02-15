@@ -41,39 +41,33 @@ const login = async (reqBody: { email: string; password: string }) => {
   try {
     const { email, password } = reqBody
 
+    // Regex Email Format
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
+    validateInput(!emailRegex.test(email), "email", "Invalid format email")
+    validateInput(password.length < 6, "password", "Password must be greater than 6 characters")
+
     // find userExists by email
     const userExists = await UserRepository.getUserByEmail(email)
-    if (!userExists) {
-      throw new Error("User not found")
-    }
+    validateInput(!userExists, "email", "Email not registered yet")
 
     // match password userExists
-    const matchPassword = await bcryptjs.compare(password, userExists.password)
+    const matchPassword = await bcryptjs.compare(password, userExists!.password)
     validateInput(!matchPassword, "password", "Password incorrect")
 
     // get data userExists
-    const { id: userId, name, username, email: userEmail, birthday } = userExists
+    const { id: userId, name, username, email: userEmail, birthday } = userExists!
 
     // set payload
     const payload = { userId, name, username, userEmail, birthday }
 
-    // Handle TOKEN
-    const accessTokenSecret = process.env.ACCESS_TOKEN
-    const refreshTokenSecret = process.env.REFRESH_TOKEN
-    if (!accessTokenSecret && !refreshTokenSecret) {
-      throw new Error("Missing secret token")
-    }
-
-    // sign access token with jwt sign, seet expire 20 min
-    // @ts-ignore
-    const accessToken = jwt.sign(payload, accessTokenSecret, {
+    // sign access token with jwt sign, set expire 20 min
+    const accessToken = jwt.sign(payload, process.env.ACCESS_TOKEN as string, {
       expiresIn: "20m",
     })
 
     // sign refresh token with jwt sign, set expire 20 min
-    // @ts-ignore
-    const refreshToken = jwt.sign(payload, refreshTokenSecret, {
-      expiresIn: "1d",
+    const refreshToken = jwt.sign(payload, process.env.REFRESH_TOKEN as string, {
+      expiresIn: "20m",
     })
 
     // update token on table users, with resfresh token
