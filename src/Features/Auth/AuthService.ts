@@ -65,9 +65,9 @@ const login = async (reqBody: { email: string; password: string }) => {
       expiresIn: "20m",
     })
 
-    // sign refresh token with jwt sign, set expire 20 min
+    // sign refresh token with jwt sign, set expire 1 Day
     const refreshToken = jwt.sign(payload, process.env.REFRESH_TOKEN as string, {
-      expiresIn: "20m",
+      expiresIn: "1d",
     })
 
     // update token on table users, with resfresh token
@@ -116,8 +116,8 @@ const refreshToken = async (token: string) => {
 
     // Set access token with jwt wign
     // @ts-ignore
-    const accessToken = jwt.sign(payload, process.env.ACCESS_TOKEN, {
-      expiresIn: "20m",
+    const accessToken = jwt.sign(payload, process.env.ACCESS_TOKEN as string, {
+      expiresIn: "1d",
     })
 
     return accessToken
