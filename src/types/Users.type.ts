@@ -24,5 +24,3 @@ export interface UserModel extends UserDTO {
 export interface UserWithToken extends UserDTO {
   token: string | null
 }
-
-

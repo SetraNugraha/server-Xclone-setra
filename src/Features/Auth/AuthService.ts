@@ -8,16 +8,15 @@ import { CreateNewUser, UserDTO } from "../../types/Users.type"
 const register = async (reqBody: CreateNewUser): Promise<UserDTO> => {
   const { name, email, password, profileImage, birthday } = reqBody
 
-  if (!name || !email || !password || !birthday) {
-    throw new Error("All fields are required")
-  }
+  validateInput(!name || !email || !password || !birthday, "input", "All fields are required")
 
   // Check Email Exists
   const checkEmailExists = await UserRepository.getUserByEmail(email)
   validateInput(checkEmailExists !== null, "email", "Email already exists")
 
   // Create Unique Username from name + last 5 letters timestamp
-  const username: string = name.trim().toLowerCase().replace(/\s+/g, "") + new Date().getTime().toString().slice(-5)
+  const firstName: string = name.trim().toLowerCase().split(" ")[0]
+  const username: string = firstName.trim().toLowerCase().replace(/\s+/g, "") + new Date().getTime().toString().slice(-5)
 
   // Hash Password
   const salt = await bcryptjs.genSalt(10)
@@ -41,10 +40,7 @@ const login = async (reqBody: { email: string; password: string }) => {
   try {
     const { email, password } = reqBody
 
-    // Regex Email Format
-    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
-    validateInput(!emailRegex.test(email), "email", "Invalid format email")
-    validateInput(password.length < 6, "password", "Password must be greater than 6 characters")
+    validateInput(!email || !password, "input", "All field are required")
 
     // find userExists by email
     const userExists = await UserRepository.getUserByEmail(email)

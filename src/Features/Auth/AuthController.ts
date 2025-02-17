@@ -5,14 +5,32 @@ import { validateInput } from "../../utils/validateError"
 
 export const register = async (req: Request, res: Response): Promise<void> => {
   try {
-    const { name, email, password, confirmPassword, birthday } = req.body
+    const { name, email, password, confirmPassword, day, month, year } = req.body
     const profileImage = req.file ? req.file.filename : null
+    const months = [
+      "January",
+      "February",
+      "March",
+      "April",
+      "Mei",
+      "June",
+      "July",
+      "August",
+      "September",
+      "October",
+      "November",
+      "December",
+    ]
+
+    const birthday = `${String(day)}-${month}-${String(year)}`
     // Regex Email Format
     const emailRegex = /^(?!.*\.{2})[a-zA-Z0-9][a-zA-Z0-9._%+-]*@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
 
+    validateInput(name.length > 25, "name", "Name cannot be longer than 25 characters.")
     validateInput(!emailRegex.test(email), "email", "Invalid format email")
     validateInput(password.length < 6, "password", "Password must be greater than 6 characters")
-    validateInput(password !== confirmPassword, "password", "Password do not match")
+    validateInput(password !== confirmPassword, "confirmPassword", "Password do not match")
+    validateInput(!months.includes(month), "month", "Invalid Month Data")
 
     // Prepare Data
     const registerData = {
@@ -64,6 +82,11 @@ export const login = async (req: Request, res: Response): Promise<void> => {
   try {
     const email = req.body.email.trim().toLowerCase()
     const password = req.body.password
+
+    // Regex Email Format
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
+    validateInput(!emailRegex.test(email), "email", "Invalid format email")
+    validateInput(password.length < 6, "password", "Password must be greater than 6 characters")
 
     const { accessToken, refreshToken } = await AuthService.login({ email, password })
 
