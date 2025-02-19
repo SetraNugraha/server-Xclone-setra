@@ -6,7 +6,24 @@ const selectPosts = async (filter = {}) => {
     const posts = await prisma.posts.findMany({
       where: filter,
       include: {
-        comment: true,
+        user: {
+          select: {
+            name: true,
+            username: true,
+            profileImage: true,
+          },
+        },
+        comment: {
+          include: {
+            user: {
+              select: {
+                name: true,
+                username: true,
+                profileImage: true,
+              },
+            },
+          },
+        },
         _count: {
           select: {
             comment: true,
@@ -14,6 +31,7 @@ const selectPosts = async (filter = {}) => {
           },
         },
       },
+      orderBy: { created_at: "desc" },
     })
 
     return posts
