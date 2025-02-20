@@ -24,6 +24,11 @@ const selectPosts = async (filter = {}) => {
             },
           },
         },
+        like: {
+          select: {
+            userId: true,
+          },
+        },
         _count: {
           select: {
             comment: true,
@@ -60,17 +65,28 @@ const insertNewPost = async (reqBody: CreateNewPost) => {
   }
 }
 
+const selectLikeByUserPostId = async (userId: string, postId: string) => {
+  try {
+    const like = await prisma.likes.findUnique({
+      where: {
+        userId_postId: {
+          userId: userId,
+          postId: postId,
+        },
+      },
+    })
+
+    return like
+  } catch (error) {
+    console.error("PostRepository Error - selectLikeByUserPostId: ", error)
+    throw new Error("Failed select like")
+  }
+}
+
 const toggleLike = async (userId: string, postId: string) => {
   try {
     return await prisma.$transaction(async (tx) => {
-      const hasLike = await tx.likes.findUnique({
-        where: {
-          userId_postId: {
-            userId: userId,
-            postId: postId,
-          },
-        },
-      })
+      const hasLike = await selectLikeByUserPostId(userId, postId)
 
       if (hasLike) {
         await tx.likes.delete({
