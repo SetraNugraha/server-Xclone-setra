@@ -242,7 +242,7 @@ export const deletePost = async (req: Request, res: Response): Promise<void> => 
 export const deleteComment = async (req: Request, res: Response): Promise<void> => {
   try {
     const commentId = req.params.commentId
-    const deletedComment = await PostService.deleteComment(commentId)
+    await PostService.deleteComment(commentId)
 
     res.status(200).json({
       success: true,
