@@ -88,9 +88,43 @@ const getUserByToken = async (token: string): Promise<UserWithToken | null> => {
   }
 }
 
+const updateProfileImage = async (userId: string, image: string) => {
+  try {
+    const result = await prisma.users.update({
+      where: { id: userId },
+      data: {
+        profileImage: image,
+      },
+    })
+
+    return result
+  } catch (error) {
+    console.error("PostRepository - updateProfileImage error: ", error)
+    throw new Error("Failed update profile image")
+  }
+}
+
+const deleteProfileImage = async (userId: string) => {
+  try {
+    const result = await prisma.users.update({
+      where: { id: userId },
+      data: {
+        profileImage: null,
+      },
+    })
+
+    return result
+  } catch (error) {
+    console.error("PostRepository - updateProfileImage error: ", error)
+    throw new Error("Failed delete profile image")
+  }
+}
+
 export default {
   getAllUsers,
   getUserById,
   getUserByEmail,
   getUserByToken,
+  updateProfileImage,
+  deleteProfileImage,
 }
