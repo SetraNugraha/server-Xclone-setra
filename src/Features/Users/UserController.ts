@@ -56,7 +56,7 @@ export const getUserById = async (req: Request, res: Response): Promise<void> =>
   }
 }
 
-export const updateProfileimage = async (req: Request, res: Response): Promise<void> => {
+export const updateProfileImage = async (req: Request, res: Response): Promise<void> => {
   try {
     const userId = req.user?.userId || ""
     const image = req.file?.filename || ""

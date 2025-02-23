@@ -1,4 +1,4 @@
-import { getAllUsers, getUserById, updateProfileimage, deleteProfileImage } from "./UserController"
+import { getAllUsers, getUserById, updateProfileImage, deleteProfileImage } from "./UserController"
 import { IRouting, HttpMethod } from "../../types/Routing.type"
 import { uploadProfileImage } from "../../middlewares/uploadImage"
 import { verifyToken } from "../../middlewares/auth"
@@ -18,7 +18,7 @@ export const UserRoutes: IRouting[] = [
     method: HttpMethod.PUT,
     url: "/users/profileImage/update",
     middleware: [verifyToken, uploadProfileImage.single("profileImage")],
-    controller: updateProfileimage,
+    controller: updateProfileImage,
   },
   {
     method: HttpMethod.PUT,

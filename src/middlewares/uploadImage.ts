@@ -1,3 +1,4 @@
+/// <reference path="../types/express.d.ts" />
 import fs from "fs"
 import multer from "multer"
 import path from "path"
@@ -9,11 +10,11 @@ const hasImagePath = (path: string) => {
   }
 }
 
-const configureMulter = (folerName: string) => {
+const configureMulter = (folderName: string) => {
   return multer({
     storage: multer.diskStorage({
       destination: (req: Request, file: Express.Multer.File, cb) => {
-        const uploadPath = path.join(process.cwd(), "public", "images", folerName)
+        const uploadPath = path.join(process.cwd(), "public", "images", folderName)
         hasImagePath(uploadPath)
         cb(null, uploadPath)
       },
@@ -30,7 +31,7 @@ const configureMulter = (folerName: string) => {
       if (allowedTypes.includes(file.mimetype)) {
         cb(null, true)
       } else {
-        req.fileValidationError = "Invalid file type! Only PNG, JPG, and JPEG are allowed.";
+        req.fileValidationError = "Invalid file type! Only PNG, JPG, and JPEG are allowed."
         cb(null, false)
       }
     },
