@@ -6,19 +6,10 @@ export const getAllPosts = async (req: Request, res: Response): Promise<void> =>
   try {
     const data = await PostService.getAllPosts()
 
-    if (!data || data?.length === 0) {
-      res.status(404).json({
-        success: true,
-        message: "Posts Not found",
-      })
-
-      return
-    }
-
     res.status(200).json({
       success: true,
       message: "Get all posts success",
-      data: data,
+      data: data!.length > 0 ? data : [],
     })
   } catch (error) {
     if (error instanceof Error) {
