@@ -1,12 +1,13 @@
 /// <reference path="../../types/express.d.ts" />
-import { Request, Response } from "express"
-import AuthService from "./AuthService"
-import { validateInput } from "../../utils/validateError"
+import { Request, Response } from "express";
+import AuthService from "./AuthService";
+import { validateInput } from "../../utils/validateError";
 
 export const register = async (req: Request, res: Response): Promise<void> => {
   try {
-    const { name, email, password, confirmPassword, day, month, year } = req.body
-    const profileImage = req.file ? req.file.filename : null
+    const { name, email, password, confirmPassword, day, month, year } =
+      req.body;
+    const profileImage = req.file ? req.file.filename : null;
     const months = [
       "January",
       "February",
@@ -20,17 +21,30 @@ export const register = async (req: Request, res: Response): Promise<void> => {
       "October",
       "November",
       "December",
-    ]
+    ];
 
-    const birthday = `${String(day)}-${month}-${String(year)}`
+    const birthday = `${String(day)}-${month}-${String(year)}`;
     // Regex Email Format
-    const emailRegex = /^(?!.*\.{2})[a-zA-Z0-9][a-zA-Z0-9._%+-]*@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
+    const emailRegex =
+      /^(?!.*\.{2})[a-zA-Z0-9][a-zA-Z0-9._%+-]*@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 
-    validateInput(name.length > 25, "name", "Name cannot be longer than 25 characters.")
-    validateInput(!emailRegex.test(email), "email", "Invalid format email")
-    validateInput(password.length < 6, "password", "Password must be greater than 6 characters")
-    validateInput(password !== confirmPassword, "confirmPassword", "Password do not match")
-    validateInput(!months.includes(month), "month", "Invalid Month Data")
+    validateInput(
+      name.length > 25,
+      "name",
+      "Name cannot be longer than 25 characters."
+    );
+    validateInput(!emailRegex.test(email), "email", "Invalid format email");
+    validateInput(
+      password.length < 6,
+      "password",
+      "Password must be greater than 6 characters"
+    );
+    validateInput(
+      password !== confirmPassword,
+      "confirmPassword",
+      "Password do not match"
+    );
+    validateInput(!months.includes(month), "month", "Invalid Month Data");
 
     // Prepare Data
     const registerData = {
@@ -40,142 +54,159 @@ export const register = async (req: Request, res: Response): Promise<void> => {
       password: password,
       profileImage: profileImage,
       birthday: birthday,
-    }
+    };
 
-    const register = await AuthService.register(registerData)
+    const register = await AuthService.register(registerData);
 
     res.status(201).json({
       success: true,
       message: "Register success",
       data: register,
-    })
+    });
   } catch (error) {
-    if (error && typeof error === "object" && "path" in error && "message" in error) {
+    if (
+      error &&
+      typeof error === "object" &&
+      "path" in error &&
+      "message" in error
+    ) {
       res.status(400).json({
         success: false,
         path: error.path,
         message: error.message,
-      })
+      });
 
-      return
+      return;
     }
 
     if (error instanceof Error) {
       res.status(400).json({
         success: false,
         message: error.message,
-      })
+      });
 
-      return
+      return;
     }
 
     res.status(500).json({
       success: false,
       message: "Internal server error",
-    })
+    });
 
-    return
+    return;
   }
-}
+};
 
 export const login = async (req: Request, res: Response): Promise<void> => {
   try {
-    const email = req.body.email.trim().toLowerCase()
-    const password = req.body.password
+    const email = req.body.email.trim().toLowerCase();
+    const password = req.body.password;
 
     // Regex Email Format
-    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
-    validateInput(!emailRegex.test(email), "email", "Invalid format email")
-    validateInput(password.length < 6, "password", "Password must be greater than 6 characters")
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    validateInput(!emailRegex.test(email), "email", "Invalid format email");
+    validateInput(
+      password.length < 6,
+      "password",
+      "Password must be greater than 6 characters"
+    );
 
-    const { accessToken, refreshToken } = await AuthService.login({ email, password })
+    const { accessToken, refreshToken } = await AuthService.login({
+      email,
+      password,
+    });
 
     res.cookie("refreshToken", refreshToken, {
       httpOnly: true,
       sameSite: "strict",
       maxAge: 24 * 60 * 60 * 1000, // Hour * minute * second * mili scond = 1 day
-    })
+    });
 
     res.status(200).json({
       success: true,
       message: "login success",
       accessToken,
-    })
+    });
   } catch (error) {
-    if (error && typeof error === "object" && "path" in error && "message" in error) {
+    if (
+      error &&
+      typeof error === "object" &&
+      "path" in error &&
+      "message" in error
+    ) {
       res.status(400).json({
         success: false,
         path: error.path,
         message: error.message,
-      })
+      });
 
-      return
+      return;
     }
 
     res.status(500).json({
       success: false,
       message: "Internal server error",
-    })
+    });
 
-    return
+    return;
   }
-}
+};
 
 export const refreshToken = async (req: Request, res: Response) => {
   try {
-    const token = req.cookies.refreshToken
-    const accessToken = await AuthService.refreshToken(token)
+    const token = req.cookies.refreshToken;
+    const accessToken = await AuthService.refreshToken(token);
 
     res.status(200).json({
       success: true,
       message: "get refreshToken success",
       accessToken,
-    })
+    });
   } catch (error) {
     if (error instanceof Error) {
       res.status(400).json({
         success: false,
         message: error.message,
-      })
+      });
 
-      return
+      return;
     }
 
     res.status(500).json({
       success: false,
       message: "Internal server error",
-    })
+    });
 
-    return
+    return;
   }
-}
+};
 
 export const logout = async (req: Request, res: Response): Promise<void> => {
   try {
-    const userId = req.params.userId
-    await AuthService.logout(userId)
+    const userId = req.params.userId;
+    await AuthService.logout(userId);
 
     res.clearCookie("refreshToken", {
       httpOnly: true,
       sameSite: "strict",
       path: "/",
-      expires: new Date(0),
-    })
-    res.sendStatus(200)
+    });
+
+    res.sendStatus(200);
   } catch (error) {
     if (error instanceof Error) {
       res.status(400).json({
         success: false,
         message: error.message,
-      })
+      });
 
-      return
+      return;
     }
     res.status(500).json({
       success: false,
       message: "Internal server error",
-    })
+    });
 
-    return
+    return;
   }
-}
+};
